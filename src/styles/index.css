@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+#container {
+    display:flex;
+    display-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#login {
+    margin:  auto;
+}
+
+#login div {
+    padding:  5px;
+    text-align: right;
+}
+
+.textInputs {
+    width: 69%;
+    text-align: left;
+    border: 1px solid #888;
+    border-radius: 5px;
+    padding: 4px;
+    background-image: radial-gradient(#ddd, #fff);
+    color: #333;
+}
+
+body {
+    background-color: #333;
+    color: #ddd;
+    font-family: 'Nunito', sans-serif;
+}
+
+#loginButton {
+    border-radius: 4px;
+    background-image: radial-gradient(#ddd, #fff);
+    padding: 10px 15px;
+    color: #333;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    box-shadow: 0;
+}
+
+div#loginButtonDiv, div#errorMessage {
+    text-align: center;
+}
+
+div#errorMessage {
+    color: #f00;
+}
+
+#loginButton:hover {
+    box-shadow: 0 0 6px #000;
+}

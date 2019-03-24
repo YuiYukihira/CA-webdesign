@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 60px;
+    transition: 0.5s;
+    color: #818181;
+}
+
+.sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+#welcometext {
+    padding: 8px 8px 8px 32px;
+    font-size: 25px;
+    display: block;
+    transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner) */
+.sidebar .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+  transition: margin-left .5s;
+  padding: 20px;
+  color: #ddd;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidebar {padding-top: 15px;}
+  .sidebar a {font-size: 18px;}
+}
+
+#openmenu {
+    padding: 20px;
+    border-radius: 15px;
+    background-image: radial-gradient(#888, #666);
+    transition: all 200ms ease-out;
+    box-shadow: 0 0 0 1px #333;
+}
+
+#openmenu:hover {
+    box-shadow: 0 0 6px #000;
+    
+}
+
+body {
+  background-color: #333;
+  font-family: 'Nunito', sans-serif;
+}
+
+#newtable, #searchtable {
+    width: 100%;
+}
+
+#newtable table, #searchtable table {
+    margin: 0 auto;
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 80%;
+}
+
+#newtable td, #searchtable td {
+    width: 75px;
+    text-align: right;
+    color: #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+#searchtable th {
+    padding: 0 auto;
+    color: #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+
+}
+
+#newtable input, #searchtable input {
+    width: 100%;
+    margin: 0 auto;
+}
+
+#searchRow {
+    border-bottom: 1px solid #ddd;
+}
+
+#changeOptions {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#addtable {
+    width: 100%
+}
+#addTable table {
+    margin: 0 auto;
+}
+
+input[type="number"], input[type="text"], input[type="date"] {
+    text-align: left;
+    border: 1px solid #888;
+    background-image: radial-gradient(#ddd, #fff);
+    padding: 5px 1px;
+    color: #333;
+}
+
+input[type="submit"], button, select {
+    border-radius: 4px;
+    background-color: #ddd; 
+    padding: 5px 10px;
+    color: #333;
+}

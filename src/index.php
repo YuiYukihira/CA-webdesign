@@ -12,27 +12,31 @@
 // Connect to database
 include("../db_conn.php");
 $conn = new mysqli($dbservername, $dbusername, $dbpassword, $dbdatabase);
-
+// If the connection to the database failed kill the process
 if($conn->connect_error) {
-    die("Connectian Failed: " .$conn->connect_error);
+    die("Connection Failed: " .$conn->connect_error);
 }
 
+// Handle a past request for logging in
 if(isset($_POST["login"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
 
-    $login_stmt = $conn->prepare("SELECT UserID, Name, HashedPW, Permissions from Users WHERE username = ?;");
+
+    $login_stmt = $conn->prepare("SELECT UserID, HashedPW, Permissions from Users WHERE username = ?;");
     $login_stmt->bind_param("s", $username);
     $login_stmt->execute();
-    $login_stmt->bind_result($userID, $userName, $hashedP, $permissions);
+    $login_stmt->bind_result($userID, $hashedP, $permissions);
     $login_stmt->fetch();
     $login_stmt->close();
     $conn->close();
 
+    // Check that the given password is equal to the hash
     if(password_verify($password, $hashedP)) {
         session_start();
         $_SESSION["use"] = $userID;
-        $_SESSION["userName"] = $userName;
+        $_SESSION["userName"] = $username;
+        // store our users permissions
         if ($permissions & (1 << 0)) {
             $_SESSION["canSeeStock"] = true;
         } else {
@@ -48,8 +52,10 @@ if(isset($_POST["login"])) {
         } else {
             $_SESSION["canAdmin"] = false;
         }
+        // redirect to the stock page
         header("location: stock.php");
     } else {
+        // display a login error message
         echo "Invalid Username or Password";
     }
 }

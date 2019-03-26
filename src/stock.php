@@ -1,4 +1,5 @@
 <?php
+// Only allow users to access this page if they are logged in, redirect to the login page if they are not
 session_start();
 if(isset($_SESSION["use"])) {
     $userID = $_SESSION["use"];
@@ -6,51 +7,71 @@ if(isset($_SESSION["use"])) {
 } else {
     header("location: index.php");
 }
+// Generate a new token for sending forms if one doesn't already exist
 if(empty($_SESSION["token"])) {
     $_SESSION["token"] = bin2hex(random_bytes(32));
 }
 $token = $_SESSION["token"];
 
+// Connect to the database
 include('../db_conn.php');
 $conn = new mysqli($dbservername, $dbusername, $dbpassword, $dbdatabase);
 
+// If the database fails to connect, kill this process
 if($conn->connect_error) {
     die("Connection Failed: " .$conn->connection_error);
 }
+
+// Handle a post request for adding a new type of stock
 if(isset($_POST["addStock"])) {
+    // Only allow this post request if the token if valid and the user has adaquate permissions
     if($_POST["token"] == $token && $_SESSION["canSetStock"]) {
         $newStockName = $_POST["addStockName"];
+        // prices are stored as ints so multiply by 100 to get the stored value
         $newStockPrice = floor($_POST["addStockPrice"]*100);
+        $newStockQuantity = $_POST["addStockQuantity"];
 
+        // Add the new stock type for its information
         $add_stmt = $conn->prepare("INSERT INTO StockInfo(StockName, StockPrice, LastModifiedBy, UserID) VALUES (?, ?, ?, ?);");
         $add_stmt->bind_param("siii", $newStockName, $newStockPrice, $userID, $userID);
         $add_stmt->execute();
 
         $add_stmt->close();
+
+        // Add a new record into the stock entries to mane the new stock have the given quantity
+        $change_stmt = $conn->prepare("INSERT INTO Stock_Entries (StockID, ChangeType, Amount, CreatedBy) VALUES (LAST_INSERT_ID(), ?, ?, ?)");
+        $sCT = 2;
+        $change_stmt->bind_param("iis", $sCT, $newStockQuantity, $userID);
+        $change_stmt->execute();
+        $change_stmt->close();
     }
 }
 
+// Handle post requests for updating the stock quantities
 if(isset($_POST["changeStock"])) {
+    // Only allow this post request if the token if valid and the user has adaquate permissions
     if($_POST["token"] == $token && $_SESSION["canSetStock"]) {
+        // Get the change type 1 for add amount 2 to set to amount
         $sCT = $_POST["changeType"];
 
+        // Start our counter so we can get all our updated
         $counter = 0;
 
         $change_stmt = $conn->prepare("INSERT INTO Stock_Entries (StockID, ChangeType, Amount, CreatedBy) VALUES (?, ?, ?, ?)");
         $change_stmt->bind_param("iiis", $sID, $sCT, $sAmount, $userID);
+        // Check all lines that have an inputted stock and insert a record
         while (isset($_POST["QuantityChangeID" . $counter])) {
-            $sID = $_POST["QuantityChangeID" . $counter];
-            $sAmount = $_POST["QuantityChangeVal" . $counter];
-            $change_stmt->execute();
+            if(isset($_POST["QuantityChangeVal" . $counter])) {
+                $sID = $_POST["QuantityChangeID" . $counter];
+                $sAmount = $_POST["QuantityChangeVal" . $counter];
+                $change_stmt->execute();
+            }
             $counter += 1;
         }
 
         $change_stmt->close();
     }
 }
-$stock_stmt = $conn->prepare("SELECT si.StockID, si.StockName, CAST(si.StockPrice/100 AS DECIMAL(8, 2)), si.CurrentQuantity, si.LastModified, Modifiers.Name, Creators.Name, si.TimeCreated FROM StockInfo AS si INNER JOIN Users AS Creators ON si.UserID = Creators.UserID INNER JOIN Users AS Modifiers ON si.LastModifiedBy = Modifiers.UserID;");
-$stock_stmt->bind_result($sID, $sName, $sPrice, $sQuantity, $sModDate, $sModName, $sCreatorName, $sCreatorDate);
-$stock_stmt->execute();
 ?>
 
 <html>
@@ -80,7 +101,7 @@ $stock_stmt->execute();
             ?>
             <div id="addTable">
                 <form action="<?php htmlentities($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <inpuh type='hidden' name='token' value='<?php echo $token; ?>'>
+                    <input type='hidden' name='token' value='<?php echo $token; ?>'>
                     <table>
                         <tr>
                             <th>Stock Name</th>
@@ -152,7 +173,13 @@ $stock_stmt->execute();
                 <div id="newTable">
                     <table>
                         <?php
+                        // Create a query for getting all the stock information
+                        $stock_stmt = $conn->prepare("SELECT si.StockID, si.StockName, CAST(si.StockPrice/100 AS DECIMAL(8, 2)), si.CurrentQuantity, si.LastModified, Modifiers.Name, Creators.Name, si.TimeCreated FROM StockInfo AS si INNER JOIN Users AS Creators ON si.UserID = Creators.UserID INNER JOIN Users AS Modifiers ON si.LastModifiedBy = Modifiers.UserID;");
+                        $stock_stmt->bind_result($sID, $sName, $sPrice, $sQuantity, $sModDate, $sModName, $sCreatorName, $sCreatorDate);
+                        $stock_stmt->execute();
+
                         $counter = 0;
+                        // Create a row in the html table for each record in the database
                         while ($stock_stmt->fetch()) {
                             echo "<tr>";
                             echo "<td>" .$sID ."</td>";
@@ -162,6 +189,7 @@ $stock_stmt->execute();
                             if ($_SESSION["canSetStock"]) {
                         ?>
                             <td>
+                                <!-- hidden input to store the stock id -->
                                 <input type="hidden" name="QuantityChangeID<?php echo $counter; ?>" value="<?php echo $sID; ?>">
                                 <input type="number" name="QuantityChangeVal<?php echo $counter; ?>" class="QuantityChange" onchange="add('QuantityChangeVal<?php echo $counter;?>')">
                             </td>
@@ -180,6 +208,7 @@ $stock_stmt->execute();
             </form>
             <?php
             } else {
+                // error message to present if the user doesn't have sufficient privileges to view stock information
                 echo "<div style='margin: 0 auto; text-align: center;'>Looks like you don't have permissions to see stock information, contact your Administrator if this is incorrect.</div>";
             }
             ?>

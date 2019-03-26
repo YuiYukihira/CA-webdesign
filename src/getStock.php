@@ -1,6 +1,7 @@
 <?php
-session_start();
 
+session_start();
+// only return anything if the user is logged in.
 if(isset($_SESSION["use"])) {
     $userID = $_SESSION["use"];
     $userName = $_SESSION["userName"];
@@ -30,10 +31,9 @@ FROM StockInfo AS si
 INNER JOIN Users AS Creators ON si.UserID = Creators.UserID
 INNER JOIN Users AS Modi ON si.UserID = Modi.UserID
 WHERE si.StockName LIKE ?";
-
+            //dynamically create our query to include only the search terms that are set.
             $typeParams = "s";
             $params = array();
-
             if($name == "*") {
                 $name = "%";
             } else {
@@ -90,6 +90,7 @@ WHERE si.StockName LIKE ?";
             $get_stmt->bind_result($sID, $sName, $sPrice, $sQuan, $sModDate, $sModName, $sCreateName, $sCreateDate);
             $get_stmt->execute();
             $counter = 0;
+            // Create a now for each of our results
             while($get_stmt->fetch()) {
                 echo "<tr>";
                 echo "<td>" .$sID ."</td>";
@@ -112,8 +113,10 @@ WHERE si.StockName LIKE ?";
 
             $get_stmt->close();
             $conn->close();
-            }
             ?>
         </table>
     </body>
 </html>
+<?php
+}
+?>

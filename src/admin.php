@@ -1,27 +1,31 @@
 <?php
 session_start();
+//if the user is not legged in redirect to the login page.
 if(!isset($_SESSION["use"])) {
     header("location: index.php");
 }
+// if the user does not have administration privileges redirect to the stock information page.
 if (!$_SESSION["canAdmin"]) {
     header("lecation: stock.php");
 }
+// if the user has not been given a token for the forms generate one now.
 if(empty($_SESSION['token'])) {
     $_SESSION['token'] = bin2hex(random_bytes(32));
 }
 $token = $_SESSION['token'];
-
 $userID = $_SESSION["use"];
 $userName = $_SESSION["userName"];
 
+// connect to the database
 include("../db_conn.php");
 $conn = new mysqli($dbservername, $dbusername, $dbpassword, $dbdatabase);
-
 if($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
 
+// handle a post request for creating new users.
 if(isset($_POST["cuSubmit"])) {
+    // check the session token is valid
     if($_POST["token"] == $token) {
         $cuName = $_POST["cuName"];
         $cuName2 = $_POST["cuName2"];
@@ -36,7 +40,9 @@ if(isset($_POST["cuSubmit"])) {
     }
 }
 
+// handle a past request for changing user details
 if(isset($_POST["userChange"])) {
+    // check that the session token is valid
     if($_POST["token"] == $token) {
         $userID = $_POST["userID"];
         $userName = $_POST["userName"];
@@ -44,6 +50,7 @@ if(isset($_POST["userChange"])) {
         $userPass = password_hash($_POST["userPassword"], PASSWORD_BCRYPT);
         $userPerms = $_POST["userPerms"];
 
+        // dynamically create our query so we only change our values that have been set.
         if($_POST["userCtype"] == 2) {
             $del_stmt = $conn->prepare("DELETE FROM Users WHERE UserID = ?");
             $del_stmt->bind_param("i", $userID);
@@ -89,6 +96,7 @@ if(isset($_POST["userChange"])) {
                 $params[] = &$userPerms;
                 $anyupdate = true;
             }
+            // only run our query if any values have actually been set.
             if($anyupdate){
                 $query .= "WHERE UserID = ?";
                 $paramTypes .= "i";
@@ -112,11 +120,7 @@ if(isset($_POST["userChange"])) {
         <div id="sidebar">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
             <h1 id="welcometext"><?php echo "Welcome " . $userName . "!"; ?></h1>
-            <?php
-            if($_SESSION["canAdmin"]) {
-                echo "<a href='admin.php'>Admin Panel</a>";
-            }
-            ?>
+            <a href='admin.php'>Admin Panel</a>";
             <a href="stock.php">Stock Information</a>
             <a href="logout.php">Log out!</a>
         </div>
@@ -138,6 +142,7 @@ if(isset($_POST["userChange"])) {
                         </tr>
                         <tr>
                             <td>Auto-Generated</td>
+                            <!-- New user form -->
                             <td><input type="text" name="cuName"></td>
                             <td><input type="text" name="cuName2"></td>
                             <td><input type="number" min="0" max="7" name="cuPerms"></td>
@@ -148,6 +153,7 @@ if(isset($_POST["userChange"])) {
                     </table>
                 </form>
                     <?php
+                    // create a table of all our users for editing
                     $user_stmt = $conn->prepare("SELECT UserID, username, Name, Permissions FROM Users");
                     $user_stmt->bind_result($uid, $uname, $uname2, $uperms);
                     $user_stmt->execute();

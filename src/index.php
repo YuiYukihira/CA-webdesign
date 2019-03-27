@@ -52,6 +52,10 @@ if(isset($_POST["login"])) {
         } else {
             $_SESSION["canAdmin"] = false;
         }
+        // if the user has not been given a token for the forms generate one now.
+        if(empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+        }
         // redirect to the stock page
         header("location: stock.php");
     } else {

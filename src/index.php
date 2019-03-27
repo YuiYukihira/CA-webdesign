@@ -11,6 +11,11 @@
 
 // Connect to database
 include("../db_conn.php");
+
+// the password functions were introduced in php5.5 so if we're on a version less than that, add the forwards compat module
+if(version_compare(phpversion(), '5.5', '<')) {
+	require 'password.php';
+}
 $conn = new mysqli($dbservername, $dbusername, $dbpassword, $dbdatabase);
 // If the connection to the database failed kill the process
 if($conn->connect_error) {

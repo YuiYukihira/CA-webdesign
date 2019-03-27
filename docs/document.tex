@@ -8,6 +8,7 @@
 \usepackage{float}
 
 \title{Continuous Asessment: ECM1417}
+\author{blue20.ex.ac.uk/as1200/Coursework/index.php}
 \begin{document}
 	\maketitle
 	\newpage
@@ -93,5 +94,5 @@
 	\paragraph{Cross site scripting}
 	Cross site scripting (XSS) can be thought of as a more powerful version of CSRF, where CSRF can only make a user unknowingly perform a predefined action, XSS allows an attacker to execute arbitrary commands on the victim giving them no limit on what they can do. To protect against XSS, any place where users can input data must be sanitized and escaped properly. In PHP this can be dane with the $htmlspecialchars$ function.
 	\paragraph{Password storage}
-	One of the most popular words of wisdom when it comes to anything security related is: ``don't attempt to make your own encryption, other people have already done it better". This lead me to using bcrypt, which is easy to use in PHP. The $password\_hash$ function has an option for bcrypt making it an simple as changing a variable. the hashes (which also contain a salt) can be stored in a 60 byte string and verified with $password\_verify$.
+	One of the most popular words of wisdom when it comes to anything security related is: ``don't attempt to make your own encryption, other people have already done it better". This lead me to using bcrypt, which is easy to use in PHP. The $password\_hash$ function has an option for bcrypt making it an simple as changing a variable. the hashes (which also contain a salt) can be stored in a 60 byte string and verified with $password\_verify$. My application is written in php7 so I used these functions as they are recommended. It wasn't until I went to put the source code on the University's computers that I realised that they use php5.4. The functions I've used were introduced in php5.5 so I can't use them. However Anthony Ferrara on Github has made a library that forward ports these functions to older functions of php so I have used it in this project because I refuse to compromise the user's security.
 \end{document}

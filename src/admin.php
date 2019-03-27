@@ -19,6 +19,10 @@ if($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
 
+if(version_compare(phpversion(), '5.5' '<')) {
+	require 'password.php'
+}
+
 // handle a post request for creating new users.
 if(isset($_POST["cuSubmit"])) {
     // check the session token is valid

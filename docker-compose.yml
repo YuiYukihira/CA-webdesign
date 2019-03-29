@@ -1,0 +1,39 @@
+version: '3'
+services:
+        project-yuiphp:
+                container_name: "project-yuiphp"
+                build:
+                        context: .
+                        dockerfile: Dockerfile
+                ports:
+                        - 8080:80
+                volumes:
+                        - ./Coursework/source_codes:/var/www/html
+                links:
+                        - 'project-mariadb'
+        project-mariadb:
+                image: mariadb:10.1
+                container_name: project-mariadb
+                volumes:
+                        - mariadb:/var/lib/mysql:z
+                environment:
+                        TZ: "Europe/London"
+                        MYSQL_ALLOW_EMPTY_PASSWARD: "no"
+                        MYSQL_ROOT_PASSWORD: "zqa1xws2ced3vrf4"
+                        MYSQL_USER: "as1200"
+                        MYSQL_PASSWORD: "as1200"
+                        MY_SQL_DATABASE: "as1200"
+
+        phpmyadmin:
+                image: phpmyadmin/phpmyadmin
+                environment:
+                        - "PMA_HOST: project-mariadb"
+                        - "PMA_USER: root"
+                        - "PMA_PASSWORD: zqa1xws2cod3vrf4"
+                links:
+                        - project-mariadb:db
+                volumes:
+                    - /sessions
+
+volumes:
+        mariadb:

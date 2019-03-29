@@ -1,13 +1,6 @@
-<html>
-    <head>
-        <title>Login Page</title>
-        <link rel="stylesheet" type="text/css" href="styles/index.css">
-    </head>
-    <body>
-        <div id="container">
-            <div id="login">
-                <div id="errorMessage">
 <?php
+session_start();
+$error_message = "";
 
 // Connect to database
 include("../db_conn.php");
@@ -38,7 +31,6 @@ if(isset($_POST["login"])) {
 
     // Check that the given password is equal to the hash
     if(password_verify($password, $hashedP)) {
-        session_start();
         $_SESSION["use"] = $userID;
         $_SESSION["userName"] = $username;
         // store our users permissions
@@ -65,9 +57,21 @@ if(isset($_POST["login"])) {
         header("location: stock.php");
     } else {
         // display a login error message
-        echo "Invalid Username or Password";
+        $error_message = "Invalid Username or Password";
     }
 }
+?>
+<html>
+    <head>
+        <title>Login Page</title>
+        <link rel="stylesheet" type="text/css" href="styles/index.css">
+    </head>
+    <body>
+        <div id="container">
+            <div id="login">
+                <div id="errorMessage">
+<?php
+echo $error_message;
 ?>
                 </div>
                 <form action="<?php echo htmlentities($_SERVER["PHP_SELF"]); ?>" method="post">

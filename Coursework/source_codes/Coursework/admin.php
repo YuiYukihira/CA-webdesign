@@ -19,8 +19,8 @@ if($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
 
-if(version_compare(phpversion(), '5.5' '<')) {
-	require 'password.php'
+if(version_compare(phpversion(), '5.5', '<')) {
+	require 'password.php';
 }
 
 // handle a post request for creating new users.
@@ -120,7 +120,7 @@ if(isset($_POST["userChange"])) {
         <div id="sidebar">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
             <h1 id="welcometext"><?php echo "Welcome " . htmlspecialchars($userName, ENT_QUOTES, 'UTF-8') . "!"; ?></h1>
-            <a href='admin.php'>Admin Panel</a>";
+            <a href='admin.php'>Admin Panel</a>
             <a href="stock.php">Stock Information</a>
             <a href="logout.php">Log out!</a>
         </div>
